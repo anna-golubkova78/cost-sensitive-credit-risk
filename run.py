@@ -1,22 +1,11 @@
-from src.data import load_data, split_data, costs
-
-from src.data import load_data
-from src import eda
+from src.data import load_data, split_data
+from src import models
 
 X, y = load_data()
+X_fit, y_fit = split_data(X, y)["fit"]
 
-print(X.shape)
-
-s = split_data(X, y)
-for name, (Xk, yk) in s.items():
-    print(name, len(yk), round(yk.mean(), 4))
-
-C_FN, C_FP = costs(s["train"][0])
-
-print("interest / principal:", round((C_FP / C_FN).mean(), 3))
-print(eda.quality_checks(X, y), "\n")
-print(eda.table1(X, y).round(2), "\n")
-print(eda.synthetic_checks(X), "\n")
-print(eda.table2(X, y).round(3), "\n")
-for col, rates in eda.default_rates(X, y).items():
-    print(rates.round(4), "\n")
+for name, spec in models.make_models().items():
+    print(f"\nTuning {name}")
+    search, oof = models.tune(spec, X_fit, y_fit)
+    models.save(name, search, oof)
+    print(name, search.best_params_, round(-search.best_score_, 6))
