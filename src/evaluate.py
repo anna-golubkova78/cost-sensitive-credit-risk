@@ -51,6 +51,7 @@ def prepare(s):
         prepared[name] = {
             "p": cal.transform(model.predict_proba(X_test)[:, 1]),
             "f1_rule": F1Rule().fit(cal.transform(oof), y_fit),
+            "calibrator": cal,
         }
     return prepared
 
