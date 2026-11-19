@@ -10,6 +10,7 @@ import pandas as pd
 
 from src import analysis, eda, evaluate, models, robustness
 from src.data import load_data, split_data
+from src.calibration import reliability_plot
 
 TABLE_DIR = Path("results/tables")
 
@@ -52,6 +53,13 @@ def main():
 
     # Sections 5.1-5.3: calibration, predictive performance, losses
     prepared = evaluate.prepare(s)
+    fig_dir = Path("results/figures")
+    fig_dir.mkdir(parents=True, exist_ok=True)
+    X_c2, y_c2 = s["c2"]
+    for name, d in prepared.items():
+        p_c2 = models.load(name)[0].best_estimator_.predict_proba(X_c2)[:, 1]
+        reliability_plot(d["calibrator"], p_c2, y_c2, name,
+                         fig_dir / f"reliability_{name.lower().replace(' ', '_')}.pdf")
     table6 = pd.DataFrame(
         {name: {**d["calibrator"].brier, "Selected": d["calibrator"].method}
          for name, d in prepared.items()}).T

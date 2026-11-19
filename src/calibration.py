@@ -8,6 +8,8 @@ from scipy.special import logit
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss
+import matplotlib.pyplot as plt
+from sklearn.calibration import calibration_curve
 
 EPS = 1e-10
 
@@ -124,3 +126,38 @@ class Calibrator:
             Calibrated probabilities.
         """
         return self._apply(p, self.method)
+
+def reliability_plot(cal, p_c2, y_c2, title, path, n_bins=10):
+    """Reliability diagram on C2 before and after calibration (Figure 1).
+
+    Parameters
+    ----------
+    cal : Calibrator
+        Fitted calibrator of one classifier.
+    p_c2 : numpy.ndarray
+        Classifier's predicted default probabilities for C2.
+    y_c2 : array-like
+        True default indicator for C2.
+    title : str
+        Plot title (the model name).
+    path : str or pathlib.Path
+        File to save the figure to (e.g. a .pdf).
+    n_bins : int
+        Number of quantile bins.
+    """
+    fig, ax = plt.subplots(figsize=(5, 5))
+    ax.plot([0, 0.4], [0, 0.4], "k--", label="Perfect calibration")
+    for method, label in [("Original", "Before calibration"),
+                          ("Platt", "Platt scaling"),
+                          ("Isotonic", "Isotonic regression")]:
+        observed, predicted = calibration_curve(y_c2, cal._apply(p_c2, method),
+                                                n_bins=n_bins, strategy="quantile")
+        ax.plot(predicted, observed, "o-", label=label)
+    ax.set(xlim=(0, 0.4), ylim=(0, 0.4), title=title,
+           xlabel="Mean predicted default probability",
+           ylabel="Observed default frequency")
+    ax.legend()
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(path)
+    plt.close(fig)
