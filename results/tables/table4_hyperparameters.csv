@@ -1,0 +1,5 @@
+,Selected,CV log-loss
+Logistic regression,"{'model__C': 0.1, 'model__l1_ratio': 1}",0.316846607166073
+Random forest,"{'model__max_features': 'sqrt', 'model__min_samples_leaf': 20, 'model__n_estimators': 200}",0.31703490527647976
+XGBoost,"{'model__learning_rate': 0.05, 'model__max_depth': 3, 'model__n_estimators': 300}",0.313480931520462
+LightGBM,"{'model__learning_rate': 0.05, 'model__n_estimators': 300, 'model__num_leaves': 15}",0.3136866183237129

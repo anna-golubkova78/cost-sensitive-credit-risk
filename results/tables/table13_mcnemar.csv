@@ -1,0 +1,5 @@
+Model,Conventional only correct,Individualized only correct,p-value
+Logistic regression,8179,2247,0.0
+Random forest,8068,1987,0.0
+XGBoost,7926,2175,0.0
+LightGBM,7591,2066,0.0
